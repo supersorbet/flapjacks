@@ -469,12 +469,12 @@ contract TransparentUpgradeableProxy is UpgradeableProxy {
     }
 }
 
-// File: contracts/BEP20UpgradeableProxy.sol
+// File: contracts/ERC20UpgradeableProxy.sol
 
 pragma solidity ^0.6.0;
 
 
-contract BEP20UpgradeableProxy is TransparentUpgradeableProxy {
+contract ERC20UpgradeableProxy is TransparentUpgradeableProxy {
 
     constructor(address logic, address admin, bytes memory data) TransparentUpgradeableProxy(logic, admin, data) public {
 

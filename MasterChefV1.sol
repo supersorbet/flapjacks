@@ -194,7 +194,7 @@ library SafeMath {
 }
 
 // 
-interface IBEP20 {
+interface IERC20 {
     /**
      * @dev Returns the amount of tokens in existence.
      */
@@ -450,20 +450,20 @@ library Address {
 
 // 
 /**
- * @title SafeBEP20
- * @dev Wrappers around BEP20 operations that throw on failure (when the token
+ * @title SafeERC20
+ * @dev Wrappers around ERC20 operations that throw on failure (when the token
  * contract returns false). Tokens that return no value (and instead revert or
  * throw on failure) are also supported, non-reverting calls are assumed to be
  * successful.
- * To use this library you can add a `using SafeBEP20 for IBEP20;` statement to your contract,
+ * To use this library you can add a `using SafeERC20 for IERC20;` statement to your contract,
  * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.
  */
-library SafeBEP20 {
+library SafeERC20 {
     using SafeMath for uint256;
     using Address for address;
 
     function safeTransfer(
-        IBEP20 token,
+        IERC20 token,
         address to,
         uint256 value
     ) internal {
@@ -471,7 +471,7 @@ library SafeBEP20 {
     }
 
     function safeTransferFrom(
-        IBEP20 token,
+        IERC20 token,
         address from,
         address to,
         uint256 value
@@ -481,13 +481,13 @@ library SafeBEP20 {
 
     /**
      * @dev Deprecated. This function has issues similar to the ones found in
-     * {IBEP20-approve}, and its usage is discouraged.
+     * {IERC20-approve}, and its usage is discouraged.
      *
      * Whenever possible, use {safeIncreaseAllowance} and
      * {safeDecreaseAllowance} instead.
      */
     function safeApprove(
-        IBEP20 token,
+        IERC20 token,
         address spender,
         uint256 value
     ) internal {
@@ -497,13 +497,13 @@ library SafeBEP20 {
         // solhint-disable-next-line max-line-length
         require(
             (value == 0) || (token.allowance(address(this), spender) == 0),
-            'SafeBEP20: approve from non-zero to non-zero allowance'
+            'SafeERC20: approve from non-zero to non-zero allowance'
         );
         _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
     }
 
     function safeIncreaseAllowance(
-        IBEP20 token,
+        IERC20 token,
         address spender,
         uint256 value
     ) internal {
@@ -512,13 +512,13 @@ library SafeBEP20 {
     }
 
     function safeDecreaseAllowance(
-        IBEP20 token,
+        IERC20 token,
         address spender,
         uint256 value
     ) internal {
         uint256 newAllowance = token.allowance(address(this), spender).sub(
             value,
-            'SafeBEP20: decreased allowance below zero'
+            'SafeERC20: decreased allowance below zero'
         );
         _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
     }
@@ -529,16 +529,16 @@ library SafeBEP20 {
      * @param token The token targeted by the call.
      * @param data The call data (encoded using abi.encode or one of its variants).
      */
-    function _callOptionalReturn(IBEP20 token, bytes memory data) private {
+    function _callOptionalReturn(IERC20 token, bytes memory data) private {
         // We need to perform a low level call here, to bypass Solidity's return data size checking mechanism, since
         // we're implementing it ourselves. We use {Address.functionCall} to perform this call, which verifies that
         // the target address contains contract code and also asserts for success in the low-level call.
 
-        bytes memory returndata = address(token).functionCall(data, 'SafeBEP20: low-level call failed');
+        bytes memory returndata = address(token).functionCall(data, 'SafeERC20: low-level call failed');
         if (returndata.length > 0) {
             // Return data is optional
             // solhint-disable-next-line max-line-length
-            require(abi.decode(returndata, (bool)), 'SafeBEP20: BEP20 operation did not succeed');
+            require(abi.decode(returndata, (bool)), 'SafeERC20: ERC20 operation did not succeed');
         }
     }
 }
@@ -643,19 +643,19 @@ contract Ownable is Context {
 
 // 
 /**
- * @dev Implementation of the {IBEP20} interface.
+ * @dev Implementation of the {IERC20} interface.
  *
  * This implementation is agnostic to the way tokens are created. This means
  * that a supply mechanism has to be added in a derived contract using {_mint}.
- * For a generic mechanism see {BEP20PresetMinterPauser}.
+ * For a generic mechanism see {ERC20PresetMinterPauser}.
  *
  * TIP: For a detailed writeup see our guide
- * https://forum.zeppelin.solutions/t/how-to-implement-BEP20-supply-mechanisms/226[How
+ * https://forum.zeppelin.solutions/t/how-to-implement-ERC20-supply-mechanisms/226[How
  * to implement supply mechanisms].
  *
  * We have followed general OpenZeppelin guidelines: functions revert instead
  * of returning `false` on failure. This behavior is nonetheless conventional
- * and does not conflict with the expectations of BEP20 applications.
+ * and does not conflict with the expectations of ERC20 applications.
  *
  * Additionally, an {Approval} event is emitted on calls to {transferFrom}.
  * This allows applications to reconstruct the allowance for all accounts just
@@ -664,9 +664,9 @@ contract Ownable is Context {
  *
  * Finally, the non-standard {decreaseAllowance} and {increaseAllowance}
  * functions have been added to mitigate the well-known issues around setting
- * allowances. See {IBEP20-approve}.
+ * allowances. See {IERC20-approve}.
  */
-contract BEP20 is Context, IBEP20, Ownable {
+contract ERC20 is Context, IERC20, Ownable {
     using SafeMath for uint256;
     using Address for address;
 
@@ -724,21 +724,21 @@ contract BEP20 is Context, IBEP20, Ownable {
     }
 
     /**
-     * @dev See {BEP20-totalSupply}.
+     * @dev See {ERC20-totalSupply}.
      */
     function totalSupply() public override view returns (uint256) {
         return _totalSupply;
     }
 
     /**
-     * @dev See {BEP20-balanceOf}.
+     * @dev See {ERC20-balanceOf}.
      */
     function balanceOf(address account) public override view returns (uint256) {
         return _balances[account];
     }
 
     /**
-     * @dev See {BEP20-transfer}.
+     * @dev See {ERC20-transfer}.
      *
      * Requirements:
      *
@@ -751,14 +751,14 @@ contract BEP20 is Context, IBEP20, Ownable {
     }
 
     /**
-     * @dev See {BEP20-allowance}.
+     * @dev See {ERC20-allowance}.
      */
     function allowance(address owner, address spender) public override view returns (uint256) {
         return _allowances[owner][spender];
     }
 
     /**
-     * @dev See {BEP20-approve}.
+     * @dev See {ERC20-approve}.
      *
      * Requirements:
      *
@@ -770,10 +770,10 @@ contract BEP20 is Context, IBEP20, Ownable {
     }
 
     /**
-     * @dev See {BEP20-transferFrom}.
+     * @dev See {ERC20-transferFrom}.
      *
      * Emits an {Approval} event indicating the updated allowance. This is not
-     * required by the EIP. See the note at the beginning of {BEP20};
+     * required by the EIP. See the note at the beginning of {ERC20};
      *
      * Requirements:
      * - `sender` and `recipient` cannot be the zero address.
@@ -790,7 +790,7 @@ contract BEP20 is Context, IBEP20, Ownable {
         _approve(
             sender,
             _msgSender(),
-            _allowances[sender][_msgSender()].sub(amount, 'BEP20: transfer amount exceeds allowance')
+            _allowances[sender][_msgSender()].sub(amount, 'ERC20: transfer amount exceeds allowance')
         );
         return true;
     }
@@ -799,7 +799,7 @@ contract BEP20 is Context, IBEP20, Ownable {
      * @dev Atomically increases the allowance granted to `spender` by the caller.
      *
      * This is an alternative to {approve} that can be used as a mitigation for
-     * problems described in {BEP20-approve}.
+     * problems described in {ERC20-approve}.
      *
      * Emits an {Approval} event indicating the updated allowance.
      *
@@ -816,7 +816,7 @@ contract BEP20 is Context, IBEP20, Ownable {
      * @dev Atomically decreases the allowance granted to `spender` by the caller.
      *
      * This is an alternative to {approve} that can be used as a mitigation for
-     * problems described in {BEP20-approve}.
+     * problems described in {ERC20-approve}.
      *
      * Emits an {Approval} event indicating the updated allowance.
      *
@@ -830,7 +830,7 @@ contract BEP20 is Context, IBEP20, Ownable {
         _approve(
             _msgSender(),
             spender,
-            _allowances[_msgSender()][spender].sub(subtractedValue, 'BEP20: decreased allowance below zero')
+            _allowances[_msgSender()][spender].sub(subtractedValue, 'ERC20: decreased allowance below zero')
         );
         return true;
     }
@@ -867,10 +867,10 @@ contract BEP20 is Context, IBEP20, Ownable {
         address recipient,
         uint256 amount
     ) internal {
-        require(sender != address(0), 'BEP20: transfer from the zero address');
-        require(recipient != address(0), 'BEP20: transfer to the zero address');
+        require(sender != address(0), 'ERC20: transfer from the zero address');
+        require(recipient != address(0), 'ERC20: transfer to the zero address');
 
-        _balances[sender] = _balances[sender].sub(amount, 'BEP20: transfer amount exceeds balance');
+        _balances[sender] = _balances[sender].sub(amount, 'ERC20: transfer amount exceeds balance');
         _balances[recipient] = _balances[recipient].add(amount);
         emit Transfer(sender, recipient, amount);
     }
@@ -885,7 +885,7 @@ contract BEP20 is Context, IBEP20, Ownable {
      * - `to` cannot be the zero address.
      */
     function _mint(address account, uint256 amount) internal {
-        require(account != address(0), 'BEP20: mint to the zero address');
+        require(account != address(0), 'ERC20: mint to the zero address');
 
         _totalSupply = _totalSupply.add(amount);
         _balances[account] = _balances[account].add(amount);
@@ -904,9 +904,9 @@ contract BEP20 is Context, IBEP20, Ownable {
      * - `account` must have at least `amount` tokens.
      */
     function _burn(address account, uint256 amount) internal {
-        require(account != address(0), 'BEP20: burn from the zero address');
+        require(account != address(0), 'ERC20: burn from the zero address');
 
-        _balances[account] = _balances[account].sub(amount, 'BEP20: burn amount exceeds balance');
+        _balances[account] = _balances[account].sub(amount, 'ERC20: burn amount exceeds balance');
         _totalSupply = _totalSupply.sub(amount);
         emit Transfer(account, address(0), amount);
     }
@@ -929,8 +929,8 @@ contract BEP20 is Context, IBEP20, Ownable {
         address spender,
         uint256 amount
     ) internal {
-        require(owner != address(0), 'BEP20: approve from the zero address');
-        require(spender != address(0), 'BEP20: approve to the zero address');
+        require(owner != address(0), 'ERC20: approve from the zero address');
+        require(spender != address(0), 'ERC20: approve to the zero address');
 
         _allowances[owner][spender] = amount;
         emit Approval(owner, spender, amount);
@@ -947,13 +947,13 @@ contract BEP20 is Context, IBEP20, Ownable {
         _approve(
             account,
             _msgSender(),
-            _allowances[account][_msgSender()].sub(amount, 'BEP20: burn amount exceeds allowance')
+            _allowances[account][_msgSender()].sub(amount, 'ERC20: burn amount exceeds allowance')
         );
     }
 }
 
 // CakeToken with Governance.
-contract CakeToken is BEP20('PancakeSwap Token', 'Cake') {
+contract CakeToken is ERC20('PancakeSwap Token', 'Cake') {
     /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).
     function mint(address _to, uint256 _amount) public onlyOwner {
         _mint(_to, _amount);
@@ -1192,7 +1192,7 @@ contract CakeToken is BEP20('PancakeSwap Token', 'Cake') {
 }
 
 // SyrupBar with Governance.
-contract SyrupBar is BEP20('SyrupBar Token', 'SYRUP') {
+contract SyrupBar is ERC20('SyrupBar Token', 'SYRUP') {
     /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).
     function mint(address _to, uint256 _amount) public onlyOwner {
         _mint(_to, _amount);
@@ -1466,7 +1466,7 @@ interface IMigratorChef {
     // CakeSwap must mint EXACTLY the same amount of CakeSwap LP tokens or
     // else something bad will happen. Traditional PancakeSwap does not
     // do that so be careful!
-    function migrate(IBEP20 token) external returns (IBEP20);
+    function migrate(IERC20 token) external returns (IERC20);
 }
 
 // MasterChef is the master of Cake. He can make Cake and he is a fair guy.
@@ -1478,7 +1478,7 @@ interface IMigratorChef {
 // Have fun reading it. Hopefully it's bug-free. God bless.
 contract MasterChef is Ownable {
     using SafeMath for uint256;
-    using SafeBEP20 for IBEP20;
+    using SafeERC20 for IERC20;
 
     // Info of each user.
     struct UserInfo {
@@ -1499,7 +1499,7 @@ contract MasterChef is Ownable {
 
     // Info of each pool.
     struct PoolInfo {
-        IBEP20 lpToken;           // Address of LP token contract.
+        IERC20 lpToken;           // Address of LP token contract.
         uint256 allocPoint;       // How many allocation points assigned to this pool. CAKEs to distribute per block.
         uint256 lastRewardBlock;  // Last block number that CAKEs distribution occurs.
         uint256 accCakePerShare; // Accumulated CAKEs per share, times 1e12. See below.
@@ -1566,7 +1566,7 @@ contract MasterChef is Ownable {
 
     // Add a new lp to the pool. Can only be called by the owner.
     // XXX DO NOT add the same LP token more than once. Rewards will be messed up if you do.
-    function add(uint256 _allocPoint, IBEP20 _lpToken, bool _withUpdate) public onlyOwner {
+    function add(uint256 _allocPoint, IERC20 _lpToken, bool _withUpdate) public onlyOwner {
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -1616,10 +1616,10 @@ contract MasterChef is Ownable {
     function migrate(uint256 _pid) public {
         require(address(migrator) != address(0), "migrate: no migrator");
         PoolInfo storage pool = poolInfo[_pid];
-        IBEP20 lpToken = pool.lpToken;
+        IERC20 lpToken = pool.lpToken;
         uint256 bal = lpToken.balanceOf(address(this));
         lpToken.safeApprove(address(migrator), bal);
-        IBEP20 newLpToken = migrator.migrate(lpToken);
+        IERC20 newLpToken = migrator.migrate(lpToken);
         require(bal == newLpToken.balanceOf(address(this)), "migrate: bad");
         pool.lpToken = newLpToken;
     }

@@ -193,7 +193,7 @@ library SafeMath {
 }
 
 // 
-interface IBEP20 {
+interface IERC20 {
     /**
      * @dev Returns the amount of tokens in existence.
      */
@@ -449,20 +449,20 @@ library Address {
 
 // 
 /**
- * @title SafeBEP20
- * @dev Wrappers around BEP20 operations that throw on failure (when the token
+ * @title SafeERC20
+ * @dev Wrappers around ERC20 operations that throw on failure (when the token
  * contract returns false). Tokens that return no value (and instead revert or
  * throw on failure) are also supported, non-reverting calls are assumed to be
  * successful.
- * To use this library you can add a `using SafeBEP20 for IBEP20;` statement to your contract,
+ * To use this library you can add a `using SafeERC20 for IERC20;` statement to your contract,
  * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.
  */
-library SafeBEP20 {
+library SafeERC20 {
     using SafeMath for uint256;
     using Address for address;
 
     function safeTransfer(
-        IBEP20 token,
+        IERC20 token,
         address to,
         uint256 value
     ) internal {
@@ -470,7 +470,7 @@ library SafeBEP20 {
     }
 
     function safeTransferFrom(
-        IBEP20 token,
+        IERC20 token,
         address from,
         address to,
         uint256 value
@@ -480,13 +480,13 @@ library SafeBEP20 {
 
     /**
      * @dev Deprecated. This function has issues similar to the ones found in
-     * {IBEP20-approve}, and its usage is discouraged.
+     * {IERC20-approve}, and its usage is discouraged.
      *
      * Whenever possible, use {safeIncreaseAllowance} and
      * {safeDecreaseAllowance} instead.
      */
     function safeApprove(
-        IBEP20 token,
+        IERC20 token,
         address spender,
         uint256 value
     ) internal {
@@ -496,13 +496,13 @@ library SafeBEP20 {
         // solhint-disable-next-line max-line-length
         require(
             (value == 0) || (token.allowance(address(this), spender) == 0),
-            'SafeBEP20: approve from non-zero to non-zero allowance'
+            'SafeERC20: approve from non-zero to non-zero allowance'
         );
         _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
     }
 
     function safeIncreaseAllowance(
-        IBEP20 token,
+        IERC20 token,
         address spender,
         uint256 value
     ) internal {
@@ -511,13 +511,13 @@ library SafeBEP20 {
     }
 
     function safeDecreaseAllowance(
-        IBEP20 token,
+        IERC20 token,
         address spender,
         uint256 value
     ) internal {
         uint256 newAllowance = token.allowance(address(this), spender).sub(
             value,
-            'SafeBEP20: decreased allowance below zero'
+            'SafeERC20: decreased allowance below zero'
         );
         _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
     }
@@ -528,16 +528,16 @@ library SafeBEP20 {
      * @param token The token targeted by the call.
      * @param data The call data (encoded using abi.encode or one of its variants).
      */
-    function _callOptionalReturn(IBEP20 token, bytes memory data) private {
+    function _callOptionalReturn(IERC20 token, bytes memory data) private {
         // We need to perform a low level call here, to bypass Solidity's return data size checking mechanism, since
         // we're implementing it ourselves. We use {Address.functionCall} to perform this call, which verifies that
         // the target address contains contract code and also asserts for success in the low-level call.
 
-        bytes memory returndata = address(token).functionCall(data, 'SafeBEP20: low-level call failed');
+        bytes memory returndata = address(token).functionCall(data, 'SafeERC20: low-level call failed');
         if (returndata.length > 0) {
             // Return data is optional
             // solhint-disable-next-line max-line-length
-            require(abi.decode(returndata, (bool)), 'SafeBEP20: BEP20 operation did not succeed');
+            require(abi.decode(returndata, (bool)), 'SafeERC20: ERC20 operation did not succeed');
         }
     }
 }
@@ -545,7 +545,7 @@ library SafeBEP20 {
 // SousChef is the chef of new tokens. He can make yummy food and he is a fair guy as well as MasterChef.
 contract SousChef {
     using SafeMath for uint256;
-    using SafeBEP20 for IBEP20;
+    using SafeERC20 for IERC20;
 
     // Info of each user.
     struct UserInfo {
@@ -561,7 +561,7 @@ contract SousChef {
     }
 
     // The SYRUP TOKEN!
-    IBEP20 public syrup;
+    IERC20 public syrup;
     // rewards created per block.
     uint256 public rewardPerBlock;
 
@@ -583,7 +583,7 @@ contract SousChef {
     event EmergencyWithdraw(address indexed user, uint256 amount);
 
     constructor(
-        IBEP20 _syrup,
+        IERC20 _syrup,
         uint256 _rewardPerBlock,
         uint256 _startBlock,
         uint256 _endBlock

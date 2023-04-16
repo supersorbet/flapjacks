@@ -128,7 +128,7 @@ interface ICakePool {
     function MAX_LOCK_DURATION() external view returns (uint256);
 }
 
-interface IBEP20 {
+interface IERC20 {
   /**
    * @dev Returns the amount of tokens in existence.
    */
@@ -578,7 +578,7 @@ contract FarmBooster is Ownable {
 
     /// @notice cake pool average locked duration calculator.
     function avgLockDuration() public view returns (uint256) {
-        uint256 totalStakedAmount = IBEP20(CAKE).balanceOf(CAKE_POOL);
+        uint256 totalStakedAmount = IERC20(CAKE).balanceOf(CAKE_POOL);
 
         uint256 totalLockedAmount = ICakePool(CAKE_POOL).totalLockedAmount();
 
@@ -665,7 +665,7 @@ contract FarmBooster is Ownable {
         // userLockedAmount > 0 means totalLockedAmount > 0
         uint256 totalLockedAmount = ICakePool(CAKE_POOL).totalLockedAmount();
 
-        IBEP20 lp = IBEP20(IMasterChefV2(MASTER_CHEF).lpToken(_pid));
+        IERC20 lp = IERC20(IMasterChefV2(MASTER_CHEF).lpToken(_pid));
         uint256 userLockedDuration = (lockEndTime - lockStartTime) / (3600 * 24); // days
 
         uint256 aB = (((lp.balanceOf(MASTER_CHEF) * userLockedAmount * userLockedDuration) * BOOST_RATIO_PRECISION) /
